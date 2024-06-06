@@ -1,0 +1,90 @@
+footer {
+    background: #414346;
+    position: relative;
+    bottom: 0;
+}
+
+.footer {
+    width: 100%;
+    padding: 10px;
+}
+
+.footerBottom {
+    font-size: 1.5em;
+}
+footer h4{
+    color: #f7f7f7;
+
+}
+
+
+.card{
+    background-color: rgb(255,255,255);
+    width: 40rem;
+    overflow: auto;
+}
+.card-text {
+    padding-top: 20px;
+    padding-bottom: 20px;
+    font-size: 20px;
+    margin-bottom: none;
+    border-bottom: 1px solid #cacaca;
+}
+.form-text.register {
+    text-decoration: none;
+    transition: all 0.5s ease-in-out;
+}
+.navbar.scrolled {
+    background-color: rgba(224, 224, 224,0.9);
+    transition: all 500ms;
+}
+.form-text.register:hover {
+    text-decoration: underline;
+    color: rgb(39, 39, 39);
+}
+#password:focus, #email:focus, #search:focus {
+    outline: 0;
+    box-shadow: 0 0 0 3px #3b3b3b4d;
+    border-color: #3b3b3b4d;
+}
+#password:focus{
+    outline: 0;
+}
+.input-control.password{
+    position: relative;
+}
+.fa-eye, .fa-eye-slash{
+    position: absolute;
+    bottom: 16%;
+    left: 95%;
+}
+.fa-eye:hover, .fa-eye-slash:hover{
+    cursor: pointer;
+}
+
+.footerAction{
+    text-decoration: underline;
+    transition: all 0.5s ease-in-out;
+    color: #f7f7f7;
+    margin-bottom: 10px;
+}
+.footerAction:hover {
+    color: rgb(172, 172, 172);
+}
+#pageTopRow{
+    padding-top: 20vh;
+    padding-bottom: 30vh;
+    background-color: #E0E0E0;
+}
+.input-control.input:focus{
+    outline: 0;
+}
+
+.input-control.error input{
+    border-color: #ff3860;
+}
+.input-control .error{
+    color: #ff3860;
+}
+/* #6c6b65 */
+/* #FFF8EA */

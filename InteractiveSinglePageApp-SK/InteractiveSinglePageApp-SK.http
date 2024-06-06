@@ -1,0 +1,6 @@
+@InteractiveSinglePageApp_SK_HostAddress = http://localhost:5138
+
+GET {{InteractiveSinglePageApp_SK_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
