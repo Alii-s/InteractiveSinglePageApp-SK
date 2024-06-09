@@ -17,7 +17,9 @@ footer h4{
 
 }
 
-
+a:hover {
+    cursor: pointer;
+}
 .card{
     background-color: rgb(255,255,255);
     width: 40rem;
@@ -42,7 +44,7 @@ footer h4{
     text-decoration: underline;
     color: rgb(39, 39, 39);
 }
-#password:focus, #email:focus, #search:focus {
+#password:focus, #passwordConf:focus, #email:focus, #search:focus {
     outline: 0;
     box-shadow: 0 0 0 3px #3b3b3b4d;
     border-color: #3b3b3b4d;
@@ -50,9 +52,10 @@ footer h4{
 #password:focus{
     outline: 0;
 }
-.input-control.password{
+.input-control.password {
     position: relative;
 }
+
 .fa-eye, .fa-eye-slash{
     position: absolute;
     bottom: 16%;
@@ -84,6 +87,9 @@ footer h4{
     border-color: #ff3860;
 }
 .input-control .error{
+    color: #ff3860;
+}
+.registerError, .loginError{
     color: #ff3860;
 }
 /* #6c6b65 */
