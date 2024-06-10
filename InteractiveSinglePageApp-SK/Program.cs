@@ -202,7 +202,7 @@ app.MapGet("/home", async (HttpContext context, IDbConnection db, IAntiforgery a
                     </div>
                     <button disabled class="btn btn-outline-dark mt-2" type="submit" id="login">Log In</button>
                 </form>
-                <a hx-get="/registerPage" hx-target=".addFeedError" class="form-text register">Don't have an account? Register
+                <a hx-get="/registerPage" hx-target=".replace" class="form-text register">Don't have an account? Register
                     Now!</a>
                 <div class="loginError"><div>
             </div>
