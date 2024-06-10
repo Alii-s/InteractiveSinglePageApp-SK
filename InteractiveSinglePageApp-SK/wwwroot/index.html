@@ -15,10 +15,9 @@
 </head>
 
 <body>
-    <section class="d-flex flex-column align-items-between" id="pageTop">
-        <nav id="mainNavbar" class="navbar navbar-expand-md sticky-top py-0">
+        <nav id="mainNavbar" class="navbar navbar-expand-md py-0 sticky-top">
             <div class="container-fluid">
-                <a class="navbar-brand justify-content-start" href="#">
+                <a class="navbar-brand justify-content-start">
                     <span class="brand">InstaFeed</span>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
@@ -39,44 +38,17 @@
             </div>
         </nav>
         <!-- nav end -->
-        <div class="replace">
-            <!-- nav end -->
-            <div class="d-flex justify-content-center" id="pageTopRow">
-                <div class="card" id="quickSignIn">
-                    <div class="card-body">
-                        <h5 class="card-title h3 pt-3">Hello!</h5>
-                        <p class="card-text">Please Log In</p>
-                        <form class="login" hx-post="/login" hx-target=".loginError">
-                            <input name = "{token.FormFieldName}" type = "hidden" value = "{token.RequestToken}"/>
-                            <div class="input-control">
-                                <label for="email" class="form-label">Email address</label>
-                                <input type="text" class="form-control mb-2" id="email" placeholder="name@example.com" name="email">
-                                <div class="error form-text mb-1"></div>
-                            </div>
-                            <div class="input-control password">
-                                <label for="password" class="form-label">Password</label>
-                                <input type="password" id="password" class="form-control mb-2" placeholder="password" name="password">
-                                <div class="error form-text"></div>
-                            </div>
-                            <button disabled class="btn btn-outline-dark mt-2" type="submit" id="login">Log In</button>
-                        </form>
-                        <a hx-get="/registerPage" hx-target=".replace" class="form-text register">Don't have an account? Register
-                            Now!</a>
-                        <div class="loginError"></div>
-                    </div>
-                </div>
-            </div>
+    <div class="replace" hx-get="/home" hx-trigger="load">
+
+    </div>
+    <footer>
+        <div class="footer" id="footer">
         </div>
-        <footer>
-            <div class="footer" id="footer">
-            </div>
-            <div class="footerBottom d-flex justify-content-center">
-                <h4>Copyright &copy;2024 Designed by <span class="designer">ALI ABDELGHANI</h4>
-                </p>
-            </div>
-        </footer>
+        <div class="footerBottom d-flex justify-content-center">
+            <h4>Copyright &copy;2024 Designed by <span class="designer">ALI ABDELGHANI</h4>
+            </p>
         </div>
-    </section>
+    </footer>
     <script src="https://code.jquery.com/jquery-3.7.0.js"
         integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
@@ -87,4 +59,5 @@
         crossorigin="anonymous"></script>
     <script src="index.js"></script>
 </body>
+
 </html>
