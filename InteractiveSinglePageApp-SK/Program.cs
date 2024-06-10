@@ -28,6 +28,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     options.Cookie.IsEssential = true;
     options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
 });
+
 var connectionString = "Data Source=wwwroot/database.db";
 builder.Services.AddSingleton<IDbConnection>(_ => new SqliteConnection(connectionString));
 using (var connection = new SqliteConnection(connectionString))
@@ -51,6 +52,7 @@ using (var connection = new SqliteConnection(connectionString))
                     )
                     """);
 }
+
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(10);
@@ -131,8 +133,6 @@ app.MapGet("/logout", async (HttpContext context) =>
     context.Session.Remove("UserId");
     return Results.NoContent();
 });
-
-
 
 app.MapPost("/addFeed", async (HttpContext context, [FromForm] string addURL, IDbConnection db) =>
 {
@@ -287,7 +287,6 @@ app.MapGet("/home", async (HttpContext context, IDbConnection db, IAntiforgery a
         return Results.Content(loggedInHtml, "text/html");
     }
 });
-
 
 app.MapGet("/loginPage", async (HttpContext context, IAntiforgery antiforgery) =>
 {
