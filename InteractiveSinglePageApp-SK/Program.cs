@@ -486,7 +486,7 @@ app.MapGet("/", (HttpContext context) =>
                     </nav>
                     <!-- nav end -->
                 <div class="replace">
-                <h2 class="text-center mt-2" hx-get="/?feed={feedEmail}" hx-trigger="every 60s" hx-target=".replace">Here are {feedEmail} feeds</h2>
+                <h2 class="text-center mt-2" hx-get="/?feed={feedEmail}" hx-trigger="every 10s" hx-target="body">Here are {feedEmail} feeds</h2>
                 {feedCards}
                 </div>
                 <footer>
