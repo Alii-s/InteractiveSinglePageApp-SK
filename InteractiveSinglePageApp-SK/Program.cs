@@ -286,7 +286,7 @@ app.MapGet("/home", async (HttpContext context, IDbConnection db, IAntiforgery a
                 </div>
             </div>
         </div>
-            <h2 class="text-center mt-2">Your Feeds</h2>
+            <h2 class="text-center mt-2" hx-get="/home" hx-trigger="every 300s" hx-target=".replace">Your Feeds</h2>
             {feedCards}
         </div>
         """;
