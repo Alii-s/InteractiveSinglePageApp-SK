@@ -237,12 +237,13 @@ app.MapGet("/home", async (HttpContext context, IDbConnection db, IAntiforgery a
                 var link = item.Links.Count > 0 ? item.Links[0]?.Uri?.AbsoluteUri ?? "#" : "#";
                 var publishedDate = item.PublishDate.DateTime;
                 // Generate HTML card for each feed item
-                feedCards.AppendLine($@"
+                feedCards.AppendLine($"""
                     <div class='feed-item'>
-                    <p class='card-text'>{summary}</p>
+                    <p dir="auto" class='card-text'>{summary}</p>
                     <a href='{link}' class='btn btn-outline-dark mb-2'>Read More</a>
                     <p class='card-text mb-2 text-muted'>Publish Date: {publishedDate}</p>
-                    </div>"
+                    </div>
+                    """
                  );
             }
             // Close the container for the feed link
