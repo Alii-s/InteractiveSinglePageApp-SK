@@ -513,7 +513,7 @@ app.MapGet("/", (HttpContext context) =>
             return Results.Content(htmlContent, "text/html");
         }
     }
-    return Results.NotFound("Please Enter a correct query string");
+    return Results.Redirect("/index.html");
 });
 app.Run();
 public class User
