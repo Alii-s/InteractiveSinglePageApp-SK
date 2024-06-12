@@ -54,6 +54,7 @@ const validateEmail = () => {
     validateInputsRegister();
   }
 }
+
 const validatePassword = () => {
   const passwordValue = password.value.trim();
   successFlagP = false;
@@ -89,7 +90,11 @@ const validateConfirmPassword = () => {
     validateInputsRegister();
   }
 }
-
+const shareFeed = () => {
+  const shareLink = window.location.origin + "/?feed=" + localStorage.getItem('email');
+  navigator.clipboard.writeText(shareLink);
+  alert("Share link copied to clipboard: " + shareLink);
+}
 const validateInputs = () => {
   if (successFlagE && successFlagP) {
     document.querySelector("#login").disabled = false;
@@ -114,6 +119,10 @@ document.body.addEventListener('htmx:afterRequest', function (evt) {
     console.log(evt.detail.requestConfig.path)
     formLogin = document.querySelector('form.login');
     if (evt.detail.requestConfig.path === '/loginPage' || evt.detail.requestConfig.path === '/home') {
+      const shareBtn = document.querySelector('#shareFeed');
+      if (shareBtn != null) {
+        shareBtn.addEventListener('click', shareFeed);
+      }
       console.log('login page loaded')
       if (email != null) {
         email.addEventListener('blur', function (e) {
@@ -163,6 +172,7 @@ document.body.addEventListener('htmx:afterRequest', function (evt) {
     if (evt.detail.requestConfig.path === '/login') {
       console.log('login post')
       if (document.querySelector('.loginMessage').innerHTML === 'Login Successful') {
+        localStorage.setItem('email', email.value);
         htmx.ajax('GET', '/home', { target: '.replace' });
         document.querySelector('.loginButton').classList.add('d-none');
         document.querySelector('.logoutNav').classList.remove('d-none');

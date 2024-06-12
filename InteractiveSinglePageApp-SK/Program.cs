@@ -15,6 +15,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using System.Net.Http;
 using System.Xml;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAntiforgery();
@@ -69,7 +70,6 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
-app.MapFallbackToFile("/index.html");
 app.UseAntiforgery();
 app.UseStaticFiles();
 app.UseHttpsRedirection();
@@ -286,8 +286,12 @@ app.MapGet("/home", async (HttpContext context, IDbConnection db, IAntiforgery a
                 </div>
             </div>
         </div>
-            <h2 class="text-center mt-2" hx-get="/home" hx-trigger="every 60s" hx-target=".replace">Your Feeds</h2>
-            {feedCards}
+            <div class="d-flex justify-content-center">
+                <h2 class="text-center mt-2" hx-get="/home" hx-trigger="every 60s" hx-target=".replace">Your Feeds</h2>
+                <button class="btn btn-outline-dark mt-2" id="shareFeed">Share Your Feeds</button>
+            </div>
+                {feedCards}
+
         </div>
         """;
         return Results.Content(loggedInHtml, "text/html");
@@ -386,7 +390,131 @@ async Task<bool> IsValidRSSFeed(string url)
         return false;
     }
 }
+app.MapGet("/", (HttpContext context) =>
+{
+    var request = context.Request;
+    var feedEmail = request.Query["feed"];
+    if (!string.IsNullOrEmpty(feedEmail))
+    {
+        using (var connection = new SqliteConnection(connectionString))
+        {
+            var feeds = connection.Query<Feed>(
+                "SELECT * FROM Feeds INNER JOIN [Users] ON Feeds.UserId = [Users].Id WHERE [Users].email = @Email",
+                new { Email = feedEmail }
+            );
+            var feedCards = new StringBuilder();
+            if (feeds.Count() == 0)
+            {
+                feedCards = new StringBuilder($"""
+                    <div style="height: 85vh;" class="d-flex align-items-center justify-content-center">
+                    <h5 class='text-center mt-2 alert alert-danger'>No feeds found for {feedEmail}</h2>
+                    </div>
+                    """);
+            }
+            else
+            {
+                foreach (var feed in feeds)
+                {
+                    XmlReader reader = XmlReader.Create(feed.Url);
+                    SyndicationFeed feedItems = SyndicationFeed.Load(reader);
+                    reader.Close();
+                    // Start a container for the feed link
+                    feedCards.AppendLine($@"
+                <div class='card mb-3 mx-auto'>
+                <div class='card-body'>
+                <h5 class='card-title'>{feedItems.Title.Text}: {feed.Url}</h5>
+                <p class='card-text text-muted feedHeader'>Last Updated: {feedItems.LastUpdatedTime}</p>");
+                    // Iterate over items and add them to the container
+                    foreach (var item in feedItems.Items)
+                    {
+                        var title = item.Title?.Text ?? "Title Not Available";
+                        var summary = item.Summary?.Text ?? "Summary Not Available";
+                        var link = item.Links.Count > 0 ? item.Links[0]?.Uri?.AbsoluteUri ?? "#" : "#";
+                        var publishedDate = item.PublishDate.DateTime;
+                        // Generate HTML card for each feed item
+                        feedCards.AppendLine($"""
+                    <div class='feed-item'>
+                    <p dir="auto" class='card-text'>{summary}</p>
+                    <a href='{link}' class='btn btn-outline-dark mb-2'>Read More</a>
+                    <p class='card-text mb-2 text-muted'>Publish Date: {publishedDate}</p>
+                    </div>
+                    """
+                         );
+                    }
+                    // Close the container for the feed link
+                    feedCards.AppendLine(@"
+                </div>
+                </div>");
+                }
+            }
+            string htmlContent = $"""
+                        <!DOCTYPE html>
+            <html lang="en">
 
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>InstaFeed</title>
+                <link rel="preconnect" href="https://fonts.googleapis.com">
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+                <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed&display=swap" rel="stylesheet">
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+                    integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+                <link rel="stylesheet" href="index.css">
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+            </head>
+
+            <body>
+                    <nav id="mainNavbar" class="navbar navbar-expand-md py-0 sticky-top">
+                        <div class="container-fluid">
+                            <a class="navbar-brand justify-content-start">
+                                <span class="brand">InstaFeed</span>
+                            </a>
+                            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false"
+                                aria-label="Toggle navigation">
+                                <span class="navbar-toggler-icon"></span>
+                            </button>
+                            <div class="collapse navbar-collapse justify-content-end" id="navbarTogglerDemo02">
+                                <ul class="navbar-nav mb-2 mb-md-0">
+                                    <li class="nav-item loginButton">
+                                        <a class="nav-link" href="index.html" aria-current="page">Home</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </nav>
+                    <!-- nav end -->
+                <div class="replace">
+                <h2 class="text-center mt-2" hx-get="/home" hx-trigger="every 60s" hx-target=".replace">Here are {feedEmail} feeds</h2>
+                {feedCards}
+                </div>
+                <footer>
+                    <div class="footer" id="footer">
+                    </div>
+                    <div class="footerBottom d-flex justify-content-center">
+                        <h4>Copyright &copy;2024 Designed by <span class="designer">ALI ABDELGHANI</h4>
+                        </p>
+                    </div>
+                </footer>
+                <script src="https://code.jquery.com/jquery-3.7.0.js"
+                    integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+                    integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+                    crossorigin="anonymous"></script>
+                <script src="https://unpkg.com/htmx.org@1.9.12"
+                    integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2"
+                    crossorigin="anonymous"></script>
+                <script src="index.js"></script>
+            </body>
+
+            </html>
+            """;
+            return Results.Content(htmlContent, "text/html");
+        }
+    }
+    return Results.NotFound("Please Enter a correct query string");
+});
 app.Run();
 public class User
 {
@@ -401,7 +529,5 @@ public class Feed
     public int? UserId { get; set; }
     public string? Url { get; set; }
 }
-
-
 
 
