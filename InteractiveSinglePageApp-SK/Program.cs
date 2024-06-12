@@ -40,16 +40,17 @@ using (var connection = new SqliteConnection(connectionString))
                         email TEXT NOT NULL UNIQUE,
                         password TEXT NOT NULL
                       
-                    )
+                    );
                     """);
 
     connection.Execute("""
                     CREATE TABLE IF NOT EXISTS Feeds (
                         Id INTEGER PRIMARY KEY AUTOINCREMENT,
                         UserId INTEGER NOT NULL,
-                        Url TEXT NOT NULL UNIQUE,
+                        Url TEXT NOT NULL,
+                        UNIQUE(UserId, Url),
                         FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE
-                    )
+                    );
                     """);
 }
 
@@ -168,12 +169,16 @@ app.MapDelete("/removeFeed", async (HttpContext context, [FromForm] string id , 
         return Results.Redirect("/logout");
     }
 
-
+    int numRows = 0;
     using (var connection = new SqliteConnection(connectionString))
     {
-        int numRows = connection.Execute("DELETE FROM Feeds WHERE Id = @Id AND UserId = @UserId", new { Id = id, UserId = userId });
+        numRows = connection.Execute("DELETE FROM Feeds WHERE Id = @Id AND UserId = @UserId", new { Id = id, UserId = userId });
     }
-    return Results.Content($"""<div class="alert alert-success removeFeedMsg" role="alert">Feed Removed Successfully.</div>""");
+    if(numRows>0)
+    {
+        return Results.Content($"""<div class="alert alert-success removeFeedMsg" role="alert">Feed Removed Successfully.</div>""");
+    }
+    return Results.Content($"""<div class="alert alert-danger removeFeedMsg" role="alert">Feed Not Found.</div>""","index/html");
 });
 
 app.MapGet("/home", async (HttpContext context, IDbConnection db, IAntiforgery antiforgery) =>
