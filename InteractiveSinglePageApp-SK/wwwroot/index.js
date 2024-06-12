@@ -2,12 +2,13 @@ const login = document.querySelector('#login');
 const card = document.querySelector('.card');
 let successFlagP = false;
 let successFlagE = false;
+let successFlagPC = false;
 // validation
 $(function () {
   $(document).scroll(function () {
-      var $nav = $("#mainNavbar");
-      var scrollDistance = 1;
-      $nav.toggleClass("scrolled", $(this).scrollTop() > scrollDistance);
+    var $nav = $("#mainNavbar");
+    var scrollDistance = 1;
+    $nav.toggleClass("scrolled", $(this).scrollTop() > scrollDistance);
   });
 });
 const isValidEmail = email => {
@@ -32,15 +33,10 @@ const setSuccess = (element) => {
   inputControl.classList.remove('error');
 }
 
-const validateInputs = () => {
-  console.log('validating')
-  console.log(document.querySelector('#email'))
-  email = document.querySelector('#email');
-  password = document.querySelector('#password');
-  successFlagP = false;
-  successFlagE = false;
+
+const validateEmail = () => {
   const emailValue = email.value.trim();
-  const passwordValue = password.value.trim();
+  successFlagE = false;
   if (emailValue === '') {
     setError(email, 'Email is required.');
   } else if (!isValidEmail(emailValue)) {
@@ -49,7 +45,18 @@ const validateInputs = () => {
     setSuccess(email);
     successFlagE = true;
   }
-
+  formLogin = document.querySelector('form.login');
+  if (formLogin != null) {
+    validateInputs();
+  }
+  formRegister = document.querySelector('form.register');
+  if (formRegister != null) {
+    validateInputsRegister();
+  }
+}
+const validatePassword = () => {
+  const passwordValue = password.value.trim();
+  successFlagP = false;
   if (passwordValue === '') {
     setError(password, 'Password is required.');
   } else if (passwordValue.length < 8) {
@@ -58,46 +65,41 @@ const validateInputs = () => {
     setSuccess(password);
     successFlagP = true;
   }
-  if (successFlagP && successFlagE) {
-    document.querySelector("#login").disabled = false;
-    console.log('success')
-  } else {
-    document.querySelector("#login").disabled = true;
+  formLogin = document.querySelector('form.login');
+  if (formLogin != null) {
+    validateInputs();
   }
-  // validation end
+  formRegister = document.querySelector('form.register');
+  if (formRegister != null) {
+    validateInputsRegister();
+  }
 }
-
-const validateInputsRegister = () => {
-  successFlagP = false;
-  successFlagE = false;
-  successFlagPC = false;
-  const registerButton = document.querySelector('#registerBtn');
-  const emailValue = email.value.trim();
+const validateConfirmPassword = () => {
   const passwordValue = password.value.trim();
   const passwordConfValue = passwordConf.value.trim();
-  if (emailValue === '') {
-    setError(email, 'Email is required.');
-  } else if (!isValidEmail(emailValue)) {
-    setError(email, 'Please enter a valid email.');
-  } else {
-    setSuccess(email);
-    successFlagE = true;
-  }
-  if (passwordValue === '') {
-    setError(password, 'Password is required.');
-  } else if (passwordValue.length < 8 || passwordValue.length > 20) {
-    setError(password, 'Password must be between 8 & 20 characters.');
-  } else {
-    setSuccess(password);
-    successFlagP = true;
-  }
+  successFlagPC = false;
   if (passwordConfValue !== passwordValue || passwordConfValue === '') {
-    setError(passwordConf, 'Please confirm your password.')
+    setError(passwordConf, 'Please confirm your password.');
   } else {
     setSuccess(passwordConf);
     successFlagPC = true;
   }
-  if (successFlagP && successFlagPC && successFlagE) {
+  formRegister = document.querySelector('form.register');
+  if (formRegister != null) {
+    validateInputsRegister();
+  }
+}
+
+const validateInputs = () => {
+  if (successFlagE && successFlagP) {
+    document.querySelector("#login").disabled = false;
+  } else {
+    document.querySelector("#login").disabled = true;
+  }
+}
+
+const validateInputsRegister = () => {
+  if (successFlagE && successFlagP && successFlagPC) {
     document.querySelector("#registerBtn").disabled = false;
   } else {
     document.querySelector("#registerBtn").disabled = true;
@@ -113,12 +115,19 @@ document.body.addEventListener('htmx:afterRequest', function (evt) {
     formLogin = document.querySelector('form.login');
     if (evt.detail.requestConfig.path === '/loginPage' || evt.detail.requestConfig.path === '/home') {
       console.log('login page loaded')
-      if (formLogin != null) {
-        formLogin.addEventListener('change', function (e) {
-          validateInputs();
+      if (email != null) {
+        email.addEventListener('blur', function (e) {
+          validateEmail();
         })
-        validateInputs();
-      }else{
+      }
+      if (password != null) {
+        password.addEventListener('blur', function (e) {
+          validatePassword();
+        })
+      }
+      if (formLogin != null) {
+        console.log('form login')
+      } else {
         document.querySelector('.loginButton').classList.add('d-none');
         document.querySelector('.logoutNav').classList.remove('d-none');
       }
@@ -127,10 +136,21 @@ document.body.addEventListener('htmx:afterRequest', function (evt) {
       console.log('register page loaded')
       let passwordConf = document.querySelector('#passwordConf');
       let formRegister = document.querySelector('form.register');
-      formRegister.addEventListener('change', function (e) {
-        validateInputsRegister();
-      })
-      validateInputsRegister();
+      if (email != null) {
+        email.addEventListener('blur', function (e) {
+          validateEmail();
+        })
+      }
+      if (password != null) {
+        password.addEventListener('blur', function (e) {
+          validatePassword();
+        })
+      }
+      if (passwordConf != null) {
+        passwordConf.addEventListener('blur', function (e) {
+          validateConfirmPassword();
+        })
+      }
     } else if (evt.detail.requestConfig.path === '/logout') {
       console.log('logout post')
       htmx.ajax('GET', '/loginPage', { target: '.replace' });
@@ -152,14 +172,14 @@ document.body.addEventListener('htmx:afterRequest', function (evt) {
       if (document.querySelector('.registerMsg').innerHTML === 'User Created Successfully.') {
         htmx.ajax('GET', '/loginPage', { target: '.replace' });
       }
-    }else if(evt.detail.requestConfig.path === '/addFeed'){
+    } else if (evt.detail.requestConfig.path === '/addFeed') {
       console.log('add feed post')
       if (document.querySelector('.addFeedMsg').innerHTML === 'Feed Added Successfully.') {
         htmx.ajax('GET', '/home', { target: '.replace' });
       }
     }
   }
-  if(evt.detail.requestConfig.verb === 'delete'){
+  if (evt.detail.requestConfig.verb === 'delete') {
     console.log('delete feed')
     if (document.querySelector('.removeFeedMsg').innerHTML === 'Feed Removed Successfully.') {
       htmx.ajax('GET', '/home', { target: '.replace' });
