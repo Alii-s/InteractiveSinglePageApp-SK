@@ -135,8 +135,9 @@ app.MapGet("/logout", async (HttpContext context) =>
     return Results.NoContent();
 });
 
-app.MapPost("/addFeed", async (HttpContext context, [FromForm] string addURL, IDbConnection db) =>
+app.MapPost("/addFeed", async (HttpContext context, [FromForm] string addURL, IDbConnection db, IAntiforgery antiforgery) =>
 {
+    await antiforgery.ValidateRequestAsync(context);
     var userId = context.Session.GetInt32("UserId");
     if (userId == null)
     {
@@ -161,8 +162,9 @@ app.MapPost("/addFeed", async (HttpContext context, [FromForm] string addURL, ID
 
 });
 
-app.MapDelete("/removeFeed", async (HttpContext context, [FromForm] string id , IDbConnection db) =>
+app.MapDelete("/removeFeed", async (HttpContext context, [FromForm] string id , IDbConnection db, IAntiforgery antiforgery) =>
 {
+    await antiforgery.ValidateRequestAsync(context);
     var userId = context.Session.GetInt32("UserId");
     if (userId == null)
     {
